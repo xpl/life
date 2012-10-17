@@ -40,3 +40,12 @@ body, html {
 .btn-single { margin-top: -2px; }
 .btn-group.btn-reset { margin-left: 10px; }
 .btn i { margin-top: 0; margin-right: 2px; margin-left: -2px; }
+
+.share { display: inline-block; position: relative; }
+.share .btn { position: relative; z-index: 2; }
+.share .dropdown { position: absolute; z-index: 0; width: 100%;
+	-webkit-box-sizing: border-box; -moz-box-sizing: border-box; -o-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box;
+	border-radius: 3px; top: 0px; padding: 25px 7px 7px 7px; background: rgba(0,0,0,0.25); visibility: hidden; }
+.share:hover .dropdown { visibility: visible; }
+.share .fb-like { margin-bottom: 7px; }
+
