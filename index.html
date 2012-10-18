@@ -54,10 +54,11 @@
 		        	 pixelAt (vec2 ( 0.0,  1.0)) +
 		        	 pixelAt (vec2 (-1.0,  1.0)) +
 		        	 pixelAt (vec2 (-1.0,  0.0))).x;
+
 		    	if (cell.x > 0.1 && (neighbours > 3.1 || neighbours < 1.9)) {
-		    		gl_FragColor = vec4 (0.0, 1.0, cell.z, 1.0); /* die */
+		    		gl_FragColor = vec4 (0.0, 1.0, cell.z, 1.0);
 		    	} else if (neighbours > 2.9 && neighbours < 3.1) {
-		    		gl_FragColor = vec4 (1.0, 1.0, 0.0, 1.0); /* born */
+		    		gl_FragColor = vec4 (1.0, 1.0, 0.0, 1.0);
 		    	} else {
 		    		gl_FragColor = cell * vec4 (1.0, 0.994, 1.0, 1.0);
 		    	}
@@ -274,7 +275,7 @@
 			</div>
 			<button class="btn btn-inverse btn-single btn-info"><i class="icon-info-sign icon-white"></i></button>
 			<div class="btn-group btn-reset">
-				<button class="btn btn-inverse reset" title="hotkey: <strong>escape</strong>">reset</button>
+				<button class="btn btn-inverse reset" title="hotkey: <strong>escape</strong>">clear</button>
 				<button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" href="javascript:{}"><span class="caret"></span></button>
 				<ul class="dropdown-menu">
 					<li><a href="javascript:{}" class="reset" data-reset-with="noise">random noise</a></li>

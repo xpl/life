@@ -2,6 +2,8 @@
  * Licensed under:	MIT
  */
 
+var debug = false
+
 Life = _.extends (Viewport, {
 	init: function () {
 		_.extend (this, {
@@ -61,18 +63,17 @@ Life = _.extends (Viewport, {
 			}),
 			/* buffers */
 			cellBuffer: null, 												// current
-			cellBuffer1: this.renderTexture ({ width: 512, height: 512 }),	// back
-			cellBuffer2: this.renderTexture ({ width: 512, height: 512 }),	// front
+			cellBuffer1: this.renderTexture ({ width: debug ? 512 : 1024, height: 512 }),	// back
+			cellBuffer2: this.renderTexture ({ width: debug ? 512 : 1024, height: 512 }),	// front
 			brushBuffer: this.renderTexture ({ width: 16, height: 16 }),	// clone stamp
 			/* transform matrices */
 			transform: new Transform (),
 			screenTransform: new Transform (),
 			/* changeable parameters */
-			scrollSpeed: 2.0,
+			scrollSpeed: debug ? 0.0 : 2.0,
 			brushSize: 16.0,
 			patternBrushScale: 1.0,
 			paused: false,
-			resetWith: 'noise',
 			brushType: 'noise',
 			/* other stuff */
 			firstFrame: true
@@ -109,7 +110,7 @@ Life = _.extends (Viewport, {
 				case 82: /* r */ this.setBrushType ('round'); break;
 				case 78: /* n */ this.setBrushType ('noise'); break;
 				case 32: /* space */ this.paused = !this.paused; break;
-				case 27: /* esc */ this.reset (this.resetWith); break;
+				case 27: /* esc */ $('.reset').click (); break;
 			}
 		}, this))
 		$(window).resize ($.proxy (function () {
@@ -142,7 +143,8 @@ Life = _.extends (Viewport, {
 			})
 		$('.reset')
 			.click ($.proxy (function (e) {
-				this.reset (this.resetWith = ($(e.target).attr ('data-reset-with') || this.resetWith))
+				this.reset ($(e.target).attr ('data-reset-with'))
+				$('.controls .scroll-speed').slider ('value', this.scrollSpeed = 0)
 			}, this))
 		$('.brush-type .btn')
 			.click ($.proxy (function (e) {
@@ -167,10 +169,15 @@ Life = _.extends (Viewport, {
 	},
 	slider: function (selector, cfg, handler) {
 		var el = $(selector)
-		el.slider (cfg).bind ('slide', $.proxy (function (e, ui) {
-			handler.call (this, ui.value, el)
-			el.find ('.ui-slider-handle').blur () /* do not want focus */
-		}, this))
+		el.slider (cfg)
+			.bind ('slide', $.proxy (function (e, ui) {
+				handler.call (this, ui.value, el)
+				el.find ('.ui-slider-handle').blur () /* do not want focus */
+			}, this))
+			.bind ('change', $.proxy (function (e, ui) {
+				/* FIXME: change event does not fire ?? */
+				handler.call (this, ui.value, el)
+			}, this))
 		return this
 	},
 	setBrushType: function (type) {
