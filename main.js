@@ -61,8 +61,8 @@ Life = _.extends (Viewport, {
 			}),
 			/* buffers */
 			cellBuffer: null, 												// current
-			cellBuffer1: this.renderTexture ({ width: 512, height: 512 }),	// back
-			cellBuffer2: this.renderTexture ({ width: 512, height: 512 }),	// front
+			cellBuffer1: this.renderTexture ({ width: 1024, height: 512 }),	// back
+			cellBuffer2: this.renderTexture ({ width: 1024, height: 512 }),	// front
 			brushBuffer: this.renderTexture ({ width: 16, height: 16 }),	// clone stamp
 			/* transform matrices */
 			transform: new Transform (),
