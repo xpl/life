@@ -136,7 +136,7 @@ Life = _.extends (Viewport, {
 			.slider ('.controls .brush-scale', { min: 0, max: 10, value: 4, step: 0.1 }, function (value, slider) {
 				this.brushSize = Math.pow (2, value)
 			})
-			.slider ('.controls .pattern-brush-scale', { min: 0, max: 6, value: 0, step: 0.1 }, function (value, slider) {
+			.slider ('.controls .pattern-brush-scale', { min: 0, max: 7, value: 0, step: 0.1 }, function (value, slider) {
 				this.patternBrushScale = Math.pow (2, value)
 			})
 		$('.reset')
