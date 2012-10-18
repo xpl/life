@@ -30,22 +30,24 @@ body, html {
 .bar .ui-slider-handle.ui-state-hover,
 .bar .ui-slider-handle.ui-state-active { border-color: white !important; }
 .bar .ui-slider-handle.ui-state-focus { outline: none; border-color: white !important; }
-.bar .btn-group { display: inline-block; margin-right: 8px; margin-left: -2px; margin-bottom: 0; }
+.bar .btn-group { display: inline-block; margin-bottom: 0; }
 .bar .btn { font-size: 12px; height: 22px; padding-top: 0px; padding-left: 7px; padding-right: 7px; font-size: 12px;}
-.bar .control-label { display: inline-block; color: white; font-weight: bold; font-size: 10px; background: rgba(0,0,0,0.5); padding: 0px 7px 1px 7px; border-radius: 3px; position: relative; top: -2px; margin-right: 8px; }
+.control-label { display: inline-block; color: white; font-weight: bold; font-size: 10px; background: rgba(0,0,0,0.5); padding: 0px 7px 1px 7px; border-radius: 3px; position: relative; top: -2px; margin-right: 8px; }
+.btn-group.brush-type { margin-right: 8px; margin-left: -2px; }
 .brush-settings {  }
 .brush-settings.round .pattern-brush-scale,
 .brush-settings.noise .pattern-brush-scale { display: none; }
 .brush-settings.pattern .brush-scale { display: none; }
-.btn-single { margin-top: -2px; }
+.btn-single { margin-top: -2px; margin-left: 6px; }
 .btn-group.btn-reset { margin-left: 10px; }
-.btn i { margin-top: 0; margin-right: 2px; margin-left: -2px; }
+.btn-share i { margin-top: 0; margin-right: 2px; margin-left: -2px; }
+.btn-info i { margin-top: 3px; }
 
 .share { display: inline-block; position: relative; }
 .share .btn { position: relative; z-index: 2; }
 .share .dropdown { position: absolute; z-index: 0; width: 100%;
 	-webkit-box-sizing: border-box; -moz-box-sizing: border-box; -o-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box;
-	border-radius: 3px; top: 0px; padding: 25px 7px 7px 7px; background: rgba(0,0,0,0.25); visibility: hidden; }
+	border-radius: 3px; top: 0px; padding: 25px 4px 4px 4px; background: rgba(0,0,0,0.25); visibility: hidden; }
 .share:hover .dropdown { visibility: visible; }
-.share .fb-like { margin-bottom: 7px; }
+.share .fb-like { margin-bottom: 4px; }
 

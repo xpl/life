@@ -160,6 +160,9 @@ Life = _.extends (Viewport, {
 			placement: 'bottom',
 			trigger: 'click'
 		})
+		$('.btn-info').click (function () {
+			$('.modal.info').modal ('show')
+		})
 	},
 	slider: function (selector, cfg, handler) {
 		var el = $(selector)
