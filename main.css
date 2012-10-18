@@ -53,3 +53,5 @@ body, html {
 .share:hover .dropdown { visibility: visible; }
 .share .fb-like { margin-bottom: 4px; }
 
+.info .twitter-share-button { position: relative; top: 4px; }
+
