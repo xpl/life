@@ -22,7 +22,7 @@ Life = _.extends (Viewport, {
 				vertex: 'cell-vs',
 				fragment: 'cell-brush-fs',
 				attributes: ['position'],
-				uniforms: ['cells', 'brushPosition1', 'brushPosition2', 'brushSize', 'seed', 'pixelSpace', 'noise']
+				uniforms: ['cells', 'brushPosition1', 'brushPosition2', 'brushSize', 'seed', 'pixelSpace', 'noise', 'fill']
 			}),
 			copyBrushShader: this.shaderProgram ({
 				vertex: 'cell-vs',
@@ -34,7 +34,7 @@ Life = _.extends (Viewport, {
 				vertex: 'cell-vs',
 				fragment: 'cell-bake-brush-fs',
 				attributes: ['position'],
-				uniforms: ['brush', 'canvas', 'origin', 'scale']
+				uniforms: ['brush', 'canvas', 'origin', 'scale', 'color']
 			}),
 			drawCellsShader: this.shaderProgram ({
 				vertex: 'simple-vs',
@@ -147,6 +147,10 @@ Life = _.extends (Viewport, {
 			.click ($.proxy (function (e) {
 				this.reset (this.resetWith = ($(e.target).attr ('data-reset-with') || this.resetWith))
 			}, this))
+		$('.brush-type .btn')
+			.click ($.proxy (function (e) {
+				this.setBrushType ($(e.target).attr ('data-brush-type'))
+			}, this))
 		$('.btn-pause')
 			.click ($.proxy (function (e) {
 				this.paused = !this.paused
@@ -190,8 +194,6 @@ Life = _.extends (Viewport, {
 	reset: function (type) {
 		if (type == 'noise') {
 			this.fillWithRandomNoise ()
-		} else if (type == 'image') {
-			this.fillWithImage ()
 		} else {
 			this.fillWithNothing ()
 		}
@@ -249,10 +251,10 @@ Life = _.extends (Viewport, {
 	onPaintStart: function (e) {
 		var pt = this.eventPoint (e)
 		this.isPainting = true
-		this.paint (pt, pt)
+		this.paint (pt, pt, e.shiftKey)
 		$(window).mousemove ($.proxy (function (e) {
 			pt2 = this.eventPoint (e)
-			this.paint (pt, pt2)
+			this.paint (pt, pt2, e.shiftKey)
 			pt = pt2
 		}, this))
 		$(window).mouseup ($.proxy (function () {
@@ -261,12 +263,12 @@ Life = _.extends (Viewport, {
 			$(window).unbind ('mousemove')
 		}, this))
 	},
-	paint: function (from, to) {
+	paint: function (from, to, erase) {
 		this.cellBuffer.draw (function () {
 			if (this.brushType == 'pattern' && this.brushBufferReady) {
-				this.paintBrushBuffer (to)
+				this.paintBrushBuffer (to, erase)
 			} else {
-				this.paintParametricBrush (from, to)
+				this.paintParametricBrush (from, to, erase)
 			}
 		}, this)
 	},
@@ -287,28 +289,19 @@ Life = _.extends (Viewport, {
 			this.gl.clear (this.gl.COLOR_BUFFER_BIT)
 		}, this)
 	},
-	fillWithImage: function () {
-		//var url = prompt ('gimme URL')
-		var image = new Image ();
-		image.src = "kraka.jpg";  // MUST BE SAME DOMAIN!!!
-		image.onload = $.proxy (function() {
-			alert ('foo')
-			this.gl.bindTexture (this.gl.TEXTURE_2D, this.cellBuffer.texture)
-			this.gl.texImage2D (this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image)
-		}, this)
-	},
-	paintBrushBuffer: function (at) {
+	paintBrushBuffer: function (at, erase) {
 		this.bakeBrushShader.use ()
 		this.bakeBrushShader.attributes.position.bindBuffer (this.square)
 		this.bakeBrushShader.uniforms.canvas.bindTexture (this.cellBuffer, 0)
 		this.bakeBrushShader.uniforms.brush.bindTexture (this.brushBuffer, 1)
+		this.bakeBrushShader.uniforms.color.set3fv (erase ? vec3.create ([0,0,0]) : vec3.create ([1,1,1]))
 		this.bakeBrushShader.uniforms.origin.set2fv (this.screenTransform.applyInverse (at))
 		this.bakeBrushShader.uniforms.scale.set2f (
 			(this.brushBuffer.width / this.cellBuffer.width) * this.patternBrushScale,
 			(this.brushBuffer.height / this.cellBuffer.height) * this.patternBrushScale)
 		this.square.draw ()
 	},
-	paintParametricBrush: function (from, to) {
+	paintParametricBrush: function (from, to, erase) {
 		var pixelSpace = new Transform ()
 			.scale ([this.viewportWidth, this.viewportHeight, 1.0])
 			.multiply (this.screenTransform)
@@ -324,6 +317,7 @@ Life = _.extends (Viewport, {
 		this.brushShader.uniforms.brushSize.set1f (Math.max (this.brushSize, texelSize))
 		this.brushShader.uniforms.seed.set2f (Math.random (), Math.random ())
 		this.brushShader.uniforms.noise.set1i (this.brushType == 'noise')
+		this.brushShader.uniforms.fill.set1f (erase ? 0.0 : 1.0)
 	    this.square.draw ()
 	},
 	springDynamics: function () {
