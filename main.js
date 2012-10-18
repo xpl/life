@@ -67,9 +67,6 @@ Life = _.extends (Viewport, {
 			/* transform matrices */
 			transform: new Transform (),
 			screenTransform: new Transform (),
-			/* speed control */
-			numIterationsToSkip: 0,
-			numIterationsPassed: 0,
 			/* changeable parameters */
 			scrollSpeed: 2.0,
 			brushSize: 16.0,
@@ -139,10 +136,6 @@ Life = _.extends (Viewport, {
 			})
 			.slider ('.controls .pattern-brush-scale', { min: 0, max: 6, value: 0, step: 0.1 }, function (value, slider) {
 				this.patternBrushScale = Math.pow (2, value)
-			})
-			.slider ('.controls .speed', { min: 0, max: 6, value: 6 }, function (value) {
-				this.numIterationsToSkip = Math.floor (Math.pow (2, 5 - value))
-				console.log (this.numIterationsToSkip)
 			})
 		$('.reset')
 			.click ($.proxy (function (e) {
@@ -265,7 +258,6 @@ Life = _.extends (Viewport, {
 		}, this))
 	},
 	fillWithRandomNoise: function () {
-		this.numIterationsPassed = 0
 		this.gl.clearColor (0.0, 0.0, 0.0, 1.0)
 		this.cellBuffer.draw (function () {
 			this.initialSetupShader.use ()
@@ -275,7 +267,6 @@ Life = _.extends (Viewport, {
 		}, this)
 	},
 	fillWithNothing: function () {
-		this.numIterationsPassed = 0
 		this.gl.clearColor (0.0, 0.0, 0.0, 1.0)
 		this.cellBuffer.draw (function () {
 			this.gl.clear (this.gl.COLOR_BUFFER_BIT)
@@ -319,16 +310,11 @@ Life = _.extends (Viewport, {
 	},
 	beforeDraw: function () {
 		if (!this.paused) {
-			if ((this.numIterationsPassed % (this.numIterationsToSkip + 1)) == 0) {
-				if (this.isPainting) {
-					this.paint (true)
-				} else {
-					this.iterate ()
-				}
-			} else if (this.isPainting) {
-				this.paint (false)
+			if (this.isPainting) {
+				this.paint (true)
+			} else {
+				this.iterate ()
 			}
-			this.numIterationsPassed++
 		} else if (this.isPainting) {
 			this.paint (false)
 		}
@@ -336,9 +322,6 @@ Life = _.extends (Viewport, {
 			this.updateBrushBuffer ()
 		}
 		this.springDynamics ()
-	},
-	getScrollSpeed: function () {
-		return this.numIterationsPassed && this.scrollSpeed /* do not apply offset on first iteration (no previous data) */
 	},
 	renderCells: function (callback) {
 		/* backbuffering */
@@ -352,7 +335,7 @@ Life = _.extends (Viewport, {
 			this.iterationShader.attributes.position.bindBuffer (this.square)
 			this.iterationShader.uniforms.previousStep.bindTexture (this.cellBuffer, 0)
 			this.iterationShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
-			this.iterationShader.uniforms.pixelOffset.set2f (0.0 / this.cellBuffer.width, -(0.5 + this.getScrollSpeed ()) / this.cellBuffer.height)
+			this.iterationShader.uniforms.pixelOffset.set2f (0.0 / this.cellBuffer.width, -(0.5 + this.scrollSpeed) / this.cellBuffer.height)
 		    this.square.draw ()
 		})
 	},
@@ -371,7 +354,7 @@ Life = _.extends (Viewport, {
 			this.patternBrushShader.uniforms.cells.bindTexture (this.cellBuffer, 0)
 			this.patternBrushShader.uniforms.brush.bindTexture (this.brushBuffer, 1)
 			this.patternBrushShader.uniforms.pixelOffset.set2f (0.0,
-				animate ? (-(0.5 + this.getScrollSpeed ()) / this.cellBuffer.height) : 0.0)
+				animate ? (-(0.5 + this.scrollSpeed) / this.cellBuffer.height) : 0.0)
 			this.patternBrushShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
 			this.patternBrushShader.uniforms.color.set3fv (this.eraseMode ? vec3.create ([0,0,0]) : vec3.create ([1,1,1]))
 			this.patternBrushShader.uniforms.origin.set2fv (this.screenTransform.applyInverse (this.paintTo))
@@ -397,7 +380,7 @@ Life = _.extends (Viewport, {
 			this.parametricBrushShader.uniforms.brushPosition2.set2fv (this.screenTransform.applyInverse (this.paintTo))
 			this.parametricBrushShader.uniforms.pixelSpace.setMatrix (pixelSpace)
 			this.parametricBrushShader.uniforms.pixelOffset.set2f (0.0,
-				animate ? (-(0.5 + this.getScrollSpeed ()) / this.cellBuffer.height) : 0.0)
+				animate ? (-(0.5 + this.scrollSpeed) / this.cellBuffer.height) : 0.0)
 			this.parametricBrushShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
 			this.parametricBrushShader.uniforms.brushSize.set1f (Math.max (this.brushSize, texelSize))
 			this.parametricBrushShader.uniforms.seed.set2f (Math.random (), Math.random ())
