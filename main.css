@@ -40,9 +40,9 @@ body, html {
 .brush-settings.noise .pattern-brush-scale { display: none; }
 .brush-settings.pattern .brush-scale { display: none; }
 .btn-single { margin-top: -2px; }
-.btn-group.btn-reset { margin-left: 10px; }
 .btn-share i, .btn-pause i { margin-top: 0; margin-right: 2px; margin-left: -2px; }
 .btn-info i { margin-top: 3px; }
+.btn-pause { margin-left: 15px; }
 
 .share { display: inline-block; position: relative; margin-right: 10px; }
 .share .btn { position: relative; z-index: 2; }
