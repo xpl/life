@@ -72,7 +72,9 @@ Life = _.extends (Viewport, {
 			brushSize: 16.0,
 			patternBrushScale: 1.0,
 			paused: false,
-			resetWith: 'noise'
+			resetWith: 'noise',
+			/* other stuff */
+			firstFrame: true
 		})
 		this.cellBuffer = this.cellBuffer1
 		this.fillWithRandomNoise ()
@@ -265,6 +267,7 @@ Life = _.extends (Viewport, {
 			this.initialSetupShader.uniforms.seed.set2f (Math.random (), Math.random ())
 			this.square.draw ()
 		}, this)
+		this.firstFrame = true
 	},
 	fillWithNothing: function () {
 		this.gl.clearColor (0.0, 0.0, 0.0, 1.0)
@@ -335,7 +338,9 @@ Life = _.extends (Viewport, {
 			this.iterationShader.attributes.position.bindBuffer (this.square)
 			this.iterationShader.uniforms.previousStep.bindTexture (this.cellBuffer, 0)
 			this.iterationShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
-			this.iterationShader.uniforms.pixelOffset.set2f (0.0 / this.cellBuffer.width, -(0.5 + this.scrollSpeed) / this.cellBuffer.height)
+			this.iterationShader.uniforms.pixelOffset.set2f (
+				0.0 / this.cellBuffer.width,
+				-(0.5 + this.scrollSpeed * !this.firstFrame) / this.cellBuffer.height)
 		    this.square.draw ()
 		})
 	},
