@@ -73,6 +73,7 @@ Life = _.extends (Viewport, {
 			patternBrushScale: 1.0,
 			paused: false,
 			resetWith: 'noise',
+			brushType: 'noise',
 			/* other stuff */
 			firstFrame: true
 		})
