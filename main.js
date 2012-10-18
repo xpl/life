@@ -331,6 +331,7 @@ Life = _.extends (Viewport, {
 		var targetBuffer = (this.cellBuffer == this.cellBuffer1 ? this.cellBuffer2 : this.cellBuffer1)
 		targetBuffer.draw (callback, this)
 		this.cellBuffer = targetBuffer
+		this.firstFrame = false
 	},
 	iterate: function () {
 		this.renderCells (function () {
@@ -359,7 +360,7 @@ Life = _.extends (Viewport, {
 			this.patternBrushShader.uniforms.cells.bindTexture (this.cellBuffer, 0)
 			this.patternBrushShader.uniforms.brush.bindTexture (this.brushBuffer, 1)
 			this.patternBrushShader.uniforms.pixelOffset.set2f (0.0,
-				animate ? (-(0.5 + this.scrollSpeed) / this.cellBuffer.height) : 0.0)
+				animate ? (-(0.5 + this.scrollSpeed * !this.firstFrame) / this.cellBuffer.height) : 0.0)
 			this.patternBrushShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
 			this.patternBrushShader.uniforms.color.set3fv (this.eraseMode ? vec3.create ([0,0,0]) : vec3.create ([1,1,1]))
 			this.patternBrushShader.uniforms.origin.set2fv (this.screenTransform.applyInverse (this.paintTo))
@@ -385,7 +386,7 @@ Life = _.extends (Viewport, {
 			this.parametricBrushShader.uniforms.brushPosition2.set2fv (this.screenTransform.applyInverse (this.paintTo))
 			this.parametricBrushShader.uniforms.pixelSpace.setMatrix (pixelSpace)
 			this.parametricBrushShader.uniforms.pixelOffset.set2f (0.0,
-				animate ? (-(0.5 + this.scrollSpeed) / this.cellBuffer.height) : 0.0)
+				animate ? (-(0.5 + this.scrollSpeed * !this.firstFrame) / this.cellBuffer.height) : 0.0)
 			this.parametricBrushShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
 			this.parametricBrushShader.uniforms.brushSize.set1f (Math.max (this.brushSize, texelSize))
 			this.parametricBrushShader.uniforms.seed.set2f (Math.random (), Math.random ())
