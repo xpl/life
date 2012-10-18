@@ -78,22 +78,45 @@
 		    precision mediump float;
 		    varying vec2 fragmentPosition;
 		    varying vec2 texCoord;
-		    uniform sampler2D canvas;
+		    uniform sampler2D cells;
 		    uniform sampler2D brush;
+		    uniform vec2 screenSpace;
 		    uniform vec2 origin;
 		    uniform vec2 scale;
 		    uniform vec3 color;
+		    uniform bool animate;
+			vec4 pixelAt (vec2 offset) {
+		    	return texture2D (cells, texCoord + offset * screenSpace);
+		    }
 		    void main (void) {
-		    	vec4 dstCell = texture2D (canvas, texCoord);
+		    	vec4 cell = pixelAt (vec2 ( 0,  0));
+		    	if (animate) {
+			    	float neighbours =
+			    		(pixelAt (vec2 (-1.0, -1.0)) +
+			        	 pixelAt (vec2 ( 0.0, -1.0)) +
+			        	 pixelAt (vec2 ( 1.0, -1.0)) +
+			        	 pixelAt (vec2 ( 1.0,  0.0)) +
+			        	 pixelAt (vec2 ( 1.0,  1.0)) +
+			        	 pixelAt (vec2 ( 0.0,  1.0)) +
+			        	 pixelAt (vec2 (-1.0,  1.0)) +
+			        	 pixelAt (vec2 (-1.0,  0.0))).x;
+			    	if (cell.x > 0.1 && (neighbours > 3.1 || neighbours < 1.9)) {
+			    		cell = vec4 (0.0, 1.0, cell.z, 1.0); /* die */
+			    	} else if (cell.x < 0.9 && neighbours > 2.9 && neighbours < 3.1) {
+			    		cell = vec4 (1.0, 1.0, 0.0, 1.0); /* born */
+			    	} else {
+			    		cell = cell * vec4 (1.0, 0.994, 1.0, 1.0);
+			    	}
+		    	}
 		    	vec2 texCoord = (((fragmentPosition - origin) / scale) + 1.0) * 0.5;
 		    	if (texCoord.x < 0.0 || texCoord.y < 0.0 || texCoord.x > 1.0 || texCoord.y > 1.0) {
-		    		gl_FragColor = dstCell;
+		    		gl_FragColor = cell;
 		    	} else {
 		        	vec4 srcCell = texture2D (brush, texCoord);
 		        	if (srcCell.x > 0.5) {
 		        		gl_FragColor = vec4 (color, 1.0); /* born */
 		        	} else {
-		        		gl_FragColor = dstCell;
+		        		gl_FragColor = cell;
 		        	}
 		        }
 		    }
@@ -107,8 +130,10 @@
 		    uniform vec2 brushPosition2;
 		    uniform float brushSize;
 		    uniform mat4 pixelSpace;
+		    uniform vec2 screenSpace;
 		    uniform vec2 seed;
 		    uniform bool noise;
+		    uniform bool animate;
 		    uniform float fill;
 		    float rand (vec2 co) {
     			return fract (sin (dot (co.xy ,vec2 (12.9898,78.233))) * 43758.5453) > 0.6 ? 1.0 : 0.0;
@@ -123,6 +148,9 @@
 				vec2 projection = v + t * (w - v);
 				return dot(p - projection);
 			}
+			vec4 pixelAt (vec2 offset) {
+		    	return texture2D (cells, texCoord + offset * screenSpace);
+		    }
 		    void main (void) {
 		    	if (distToSegmentSquared (
 		    		(vec4(brushPosition1,1,1)*pixelSpace).xy,
@@ -130,7 +158,26 @@
 		    		(vec4(fragmentPosition,1,1)*pixelSpace).xy) < brushSize * brushSize) {
 		    		gl_FragColor = vec4 (fill * (noise ? rand (seed + fragmentPosition) : 1.0), 0.98, 1.0, 1.0);
 		    	} else {
-		    		gl_FragColor = texture2D (cells, texCoord);
+		    		vec4 cell = pixelAt (vec2 ( 0,  0));
+		    		if (animate) {
+				    	float neighbours =
+				    		(pixelAt (vec2 (-1.0, -1.0)) +
+				        	 pixelAt (vec2 ( 0.0, -1.0)) +
+				        	 pixelAt (vec2 ( 1.0, -1.0)) +
+				        	 pixelAt (vec2 ( 1.0,  0.0)) +
+				        	 pixelAt (vec2 ( 1.0,  1.0)) +
+				        	 pixelAt (vec2 ( 0.0,  1.0)) +
+				        	 pixelAt (vec2 (-1.0,  1.0)) +
+				        	 pixelAt (vec2 (-1.0,  0.0))).x;
+				    	if (cell.x > 0.1 && (neighbours > 3.1 || neighbours < 1.9)) {
+				    		cell = vec4 (0.0, 1.0, cell.z, 1.0); /* die */
+				    	} else if (cell.x < 0.9 && neighbours > 2.9 && neighbours < 3.1) {
+				    		cell = vec4 (1.0, 1.0, 0.0, 1.0); /* born */
+				    	} else {
+				    		cell = cell * vec4 (1.0, 0.994, 1.0, 1.0);
+				    	}
+			    	}
+			    	gl_FragColor = cell;
 		    	}
 		    }
 		</script>

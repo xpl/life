@@ -18,23 +18,24 @@ Life = _.extends (Viewport, {
 				attributes: ['position'],
 				uniforms: ['previousStep', 'screenSpace', 'pixelOffset']
 			}),
-			brushShader: this.shaderProgram ({
-				vertex: 'cell-vs',
+			parametricBrushShader: this.shaderProgram ({
+				vertex: 'cell-vs-pixeloffset',
 				fragment: 'cell-brush-fs',
 				attributes: ['position'],
-				uniforms: ['cells', 'brushPosition1', 'brushPosition2', 'brushSize', 'seed', 'pixelSpace', 'noise', 'fill']
+				uniforms: ['cells', 'brushPosition1', 'brushPosition2', 'brushSize', 'seed',
+					'pixelSpace', 'screenSpace', 'pixelOffset', 'noise', 'fill', 'animate']
+			}),
+			patternBrushShader: this.shaderProgram ({
+				vertex: 'cell-vs-pixeloffset',
+				fragment: 'cell-bake-brush-fs',
+				attributes: ['position'],
+				uniforms: ['brush', 'cells', 'origin', 'scale', 'color', 'screenSpace', 'pixelOffset', 'animate']
 			}),
 			copyBrushShader: this.shaderProgram ({
 				vertex: 'cell-vs',
 				fragment: 'cell-copy-brush-fs',
 				attributes: ['position'],
 				uniforms: ['source', 'origin', 'scale']
-			}),
-			bakeBrushShader: this.shaderProgram ({
-				vertex: 'cell-vs',
-				fragment: 'cell-bake-brush-fs',
-				attributes: ['position'],
-				uniforms: ['brush', 'canvas', 'origin', 'scale', 'color']
 			}),
 			drawCellsShader: this.shaderProgram ({
 				vertex: 'simple-vs',
@@ -249,28 +250,18 @@ Life = _.extends (Viewport, {
 		}, this))
 	},
 	onPaintStart: function (e) {
-		var pt = this.eventPoint (e)
 		this.isPainting = true
-		this.paint (pt, pt, e.shiftKey)
+		this.paintFrom = this.paintTo = this.eventPoint (e)
+		this.eraseMode = e.shiftKey
 		$(window).mousemove ($.proxy (function (e) {
-			pt2 = this.eventPoint (e)
-			this.paint (pt, pt2, e.shiftKey)
-			pt = pt2
+			this.paintTo = this.eventPoint (e)
+			this.eraseMode = e.shiftKey
 		}, this))
 		$(window).mouseup ($.proxy (function () {
 			this.isPainting = false
 			$(window).unbind ('mouseup')
 			$(window).unbind ('mousemove')
 		}, this))
-	},
-	paint: function (from, to, erase) {
-		this.cellBuffer.draw (function () {
-			if (this.brushType == 'pattern' && this.brushBufferReady) {
-				this.paintBrushBuffer (to, erase)
-			} else {
-				this.paintParametricBrush (from, to, erase)
-			}
-		}, this)
 	},
 	fillWithRandomNoise: function () {
 		this.numIterationsPassed = 0
@@ -288,37 +279,6 @@ Life = _.extends (Viewport, {
 		this.cellBuffer.draw (function () {
 			this.gl.clear (this.gl.COLOR_BUFFER_BIT)
 		}, this)
-	},
-	paintBrushBuffer: function (at, erase) {
-		this.bakeBrushShader.use ()
-		this.bakeBrushShader.attributes.position.bindBuffer (this.square)
-		this.bakeBrushShader.uniforms.canvas.bindTexture (this.cellBuffer, 0)
-		this.bakeBrushShader.uniforms.brush.bindTexture (this.brushBuffer, 1)
-		this.bakeBrushShader.uniforms.color.set3fv (erase ? vec3.create ([0,0,0]) : vec3.create ([1,1,1]))
-		this.bakeBrushShader.uniforms.origin.set2fv (this.screenTransform.applyInverse (at))
-		this.bakeBrushShader.uniforms.scale.set2f (
-			(this.brushBuffer.width / this.cellBuffer.width) * this.patternBrushScale,
-			(this.brushBuffer.height / this.cellBuffer.height) * this.patternBrushScale)
-		this.square.draw ()
-	},
-	paintParametricBrush: function (from, to, erase) {
-		var pixelSpace = new Transform ()
-			.scale ([this.viewportWidth, this.viewportHeight, 1.0])
-			.multiply (this.screenTransform)
-		var texelSize =
-			pixelSpace.apply ([0,0,0])[0] -
-			pixelSpace.apply ([-1.0 / this.cellBuffer.width, 0, 0])[0]
-		this.brushShader.use ()
-		this.brushShader.attributes.position.bindBuffer (this.square)
-		this.brushShader.uniforms.cells.bindTexture (this.cellBuffer, 0)
-		this.brushShader.uniforms.brushPosition1.set2fv (this.screenTransform.applyInverse (from))
-		this.brushShader.uniforms.brushPosition2.set2fv (this.screenTransform.applyInverse (to))
-		this.brushShader.uniforms.pixelSpace.setMatrix (pixelSpace)
-		this.brushShader.uniforms.brushSize.set1f (Math.max (this.brushSize, texelSize))
-		this.brushShader.uniforms.seed.set2f (Math.random (), Math.random ())
-		this.brushShader.uniforms.noise.set1i (this.brushType == 'noise')
-		this.brushShader.uniforms.fill.set1f (erase ? 0.0 : 1.0)
-	    this.square.draw ()
 	},
 	springDynamics: function () {
 		var zoom = this.getZoom ()
@@ -357,29 +317,88 @@ Life = _.extends (Viewport, {
 		this.screenTransform = this.transform.multiply (viewportTransform)
 	},
 	beforeDraw: function () {
-		if (!this.paused) {
-			if ((this.numIterationsPassed % (this.numIterationsToSkip + 1)) == 0) {
-				this.iteration ()
+		var targetBuffer = (this.cellBuffer == this.cellBuffer1 ? this.cellBuffer2 : this.cellBuffer1) /* backbuffering */
+		targetBuffer.draw (function () {
+			if (!this.paused) {
+				if ((this.numIterationsPassed % (this.numIterationsToSkip + 1)) == 0) {
+					if (this.isPainting) {
+						this.paint (true)
+					} else {
+						this.iteration ()
+					}
+					this.cellBuffer = targetBuffer
+				} else if (this.isPainting) {
+					this.paint (false)
+					this.cellBuffer = targetBuffer
+				}
+				this.numIterationsPassed++
+			} else if (this.isPainting) {
+				this.paint (false)
+				this.cellBuffer = targetBuffer
 			}
-			this.numIterationsPassed++
-		}
+		}, this)
 		if (this.isCloning) {
 			this.updateBrushBuffer ()
 		}
 		this.springDynamics ()
 	},
+	getScrollSpeed: function () {
+		return this.numIterationsPassed && this.scrollSpeed /* do not apply offset on first iteration (no previous data) */
+	},
 	iteration: function () {
-		var targetBuffer = (this.cellBuffer == this.cellBuffer1 ? this.cellBuffer2 : this.cellBuffer1) /* backbuffering */
-		var scrollSpeed = this.numIterationsPassed && this.scrollSpeed /* do not apply offset on first iteration (no previous data) */
-		targetBuffer.draw (function () {
-			this.iterationShader.use ()
-			this.iterationShader.attributes.position.bindBuffer (this.square)
-			this.iterationShader.uniforms.previousStep.bindTexture (this.cellBuffer, 0)
-			this.iterationShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
-			this.iterationShader.uniforms.pixelOffset.set2f (0.0 / this.cellBuffer.width, -(0.5 + scrollSpeed) / this.cellBuffer.height)
-		    this.square.draw ()
-		    this.cellBuffer = targetBuffer
-		}, this)
+		this.iterationShader.use ()
+		this.iterationShader.attributes.position.bindBuffer (this.square)
+		this.iterationShader.uniforms.previousStep.bindTexture (this.cellBuffer, 0)
+		this.iterationShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
+		this.iterationShader.uniforms.pixelOffset.set2f (0.0 / this.cellBuffer.width, -(0.5 + this.getScrollSpeed ()) / this.cellBuffer.height)
+	    this.square.draw ()
+	},
+	paint: function (animate) {
+		if (this.brushType == 'pattern' && this.brushBufferReady) {
+			this.paintBrushBuffer (animate)
+		} else {
+			this.paintParametricBrush (animate)
+		}
+		this.paintFrom = this.paintTo
+	},
+	paintBrushBuffer: function (animate) {
+		this.patternBrushShader.use ()
+		this.patternBrushShader.attributes.position.bindBuffer (this.square)
+		this.patternBrushShader.uniforms.cells.bindTexture (this.cellBuffer, 0)
+		this.patternBrushShader.uniforms.brush.bindTexture (this.brushBuffer, 1)
+		this.patternBrushShader.uniforms.pixelOffset.set2f (0.0,
+			animate ? (-(0.5 + this.getScrollSpeed ()) / this.cellBuffer.height) : 0.0)
+		this.patternBrushShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
+		this.patternBrushShader.uniforms.color.set3fv (this.eraseMode ? vec3.create ([0,0,0]) : vec3.create ([1,1,1]))
+		this.patternBrushShader.uniforms.origin.set2fv (this.screenTransform.applyInverse (this.paintTo))
+		this.patternBrushShader.uniforms.animate.set1i (animate ? 1 : 0)
+		this.patternBrushShader.uniforms.scale.set2f (
+			(this.brushBuffer.width / this.cellBuffer.width) * this.patternBrushScale,
+			(this.brushBuffer.height / this.cellBuffer.height) * this.patternBrushScale)
+		this.square.draw ()
+	},
+	paintParametricBrush: function (animate) {
+		var pixelSpace = new Transform ()
+			.scale ([this.viewportWidth, this.viewportHeight, 1.0])
+			.multiply (this.screenTransform)
+		var texelSize =
+			pixelSpace.apply ([0,0,0])[0] -
+			pixelSpace.apply ([-1.0 / this.cellBuffer.width, 0, 0])[0]
+		this.parametricBrushShader.use ()
+		this.parametricBrushShader.attributes.position.bindBuffer (this.square)
+		this.parametricBrushShader.uniforms.cells.bindTexture (this.cellBuffer, 0)
+		this.parametricBrushShader.uniforms.brushPosition1.set2fv (this.screenTransform.applyInverse (this.paintFrom))
+		this.parametricBrushShader.uniforms.brushPosition2.set2fv (this.screenTransform.applyInverse (this.paintTo))
+		this.parametricBrushShader.uniforms.pixelSpace.setMatrix (pixelSpace)
+		this.parametricBrushShader.uniforms.pixelOffset.set2f (0.0,
+			animate ? (-(0.5 + this.getScrollSpeed ()) / this.cellBuffer.height) : 0.0)
+		this.parametricBrushShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
+		this.parametricBrushShader.uniforms.brushSize.set1f (Math.max (this.brushSize, texelSize))
+		this.parametricBrushShader.uniforms.seed.set2f (Math.random (), Math.random ())
+		this.parametricBrushShader.uniforms.noise.set1i (this.brushType == 'noise')
+		this.parametricBrushShader.uniforms.fill.set1f (this.eraseMode ? 0.0 : 1.0)
+		this.parametricBrushShader.uniforms.animate.set1i (animate ? 1 : 0)
+	    this.square.draw ()
 	},
 	updateBrushBuffer: function () {
 		this.brushBuffer.draw (function () {
