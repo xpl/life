@@ -17,7 +17,7 @@ body, html {
 	width: 100%; padding: 8px 0;
 	text-align: center;
 }
-.slider { height: 8px; margin-right: 5px; display: inline-block; width: 70px; position: relative; top: 2px; }
+.slider { height: 8px; margin-right: 5px; display: inline-block; width: 70px; position: relative; top: 1px; }
 .bar .ui-slider { background: black !important; border-color: #555555; }
 .bar .ui-slider-handle,
 .bar .ui-slider-handle.ui-state-focus {
@@ -33,7 +33,7 @@ body, html {
 .bar .ui-slider-handle.ui-state-focus { outline: none; border-color: white !important; }
 .bar .btn-group { display: inline-block; margin-bottom: 0; }
 .bar .btn { font-size: 12px; height: 22px; padding-top: 0px; padding-left: 7px; padding-right: 7px; font-size: 12px;}
-.control-label { display: inline-block; color: white; font-weight: bold; font-size: 10px; background: rgba(0,0,0,0.5); padding: 0px 7px 1px 7px; border-radius: 3px; margin-right: 8px; }
+.control-label { position: relative; top: -1px; display: inline-block; color: white; font-weight: bold; font-size: 10px; background: rgba(0,0,0,0.5); padding: 0px 7px 1px 7px; border-radius: 3px; margin-right: 8px; }
 .btn-group.brush-type { margin-right: 5px; margin-left: 2px; }
 .brush-settings.round .pattern-brush-scale,
 .brush-settings.noise .pattern-brush-scale { display: none; }
@@ -41,11 +41,11 @@ body, html {
 .btn-single { margin-top: -2px; }
 .btn-share i, .btn-pause i { margin-top: 0; margin-right: 2px; margin-left: -2px; }
 .btn-info i { margin-top: 3px; }
-.btn-pause { margin-left: 15px; }
+.btn-pause { margin-right: 10px; }
 
 .dropdown-menu { text-align: left; }
 
-.share { display: inline-block; position: relative; margin-right: 10px; }
+.share { display: inline-block; position: relative; }
 .share .btn { position: relative; z-index: 2; }
 .share .dropdown { position: absolute; z-index: 0; width: 100%;
 	-webkit-box-sizing: border-box; -moz-box-sizing: border-box; -o-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box;

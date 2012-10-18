@@ -263,8 +263,29 @@
 		   }(document));
 		</script>
 		<div class="bar controls">
-			<span class="control-label">size X</span><div class="width slider"></div>
-			<span class="control-label">size Y</span><div class="height slider"></div>
+			<div class="share">
+				<button class="btn btn-inverse btn-single btn-share">
+					<i class="icon-share icon-white"></i>like / tweet
+				</button>
+				<div class="dropdown">
+					<div class="fb-like" data-href="http://xpl.github.com/life/" data-send="false" data-layout="button_count" data-width="100" data-show-faces="true" data-colorscheme="dark"></div>
+					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://xpl.github.com/life/">Tweet</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+				</div>
+			</div>
+			<button class="btn btn-inverse btn-single btn-info"><i class="icon-info-sign icon-white"></i></button>
+			<div class="btn-group btn-reset">
+				<button class="btn btn-inverse reset" title="hotkey: <strong>escape</strong>">reset</button>
+				<button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" href="javascript:{}"><span class="caret"></span></button>
+				<ul class="dropdown-menu pull-right">
+					<li><a href="javascript:{}" class="reset" data-reset-with="noise">random noise</a></li>
+					<li><a href="javascript:{}" class="reset" data-reset-with="nothing">emptiness</a></li>
+				</ul>
+			</div>
+			<button class="btn btn-inverse btn-single btn-pause" title="hotkey: <strong>space</strong>">
+				<i class="icon-pause icon-white"></i>pause
+			</button>
+			<span class="control-label">speed</span><div class="scroll-speed slider"></div>
 			<span class="brush-settings round">
 				<span class="control-label" style="margin-right: 4px;">brush</span>
 				<div class="brush-scale slider"></div>
@@ -284,30 +305,9 @@
 						title="press <strong>ALT</strong> on keyboard to select pattern">pattern</button>
 				</div>
 			</span>
+			<span class="control-label">size X</span><div class="width slider"></div>
+			<span class="control-label">size Y</span><div class="height slider"></div>
 			<!--<span class="control-label">speed</span><div class="speed slider"></div>-->
-			<span class="control-label">speed</span><div class="scroll-speed slider"></div>
-			<button class="btn btn-inverse btn-single btn-pause" title="hotkey: <strong>space</strong>">
-				<i class="icon-pause icon-white"></i>pause
-			</button>
-			<div class="btn-group btn-reset">
-				<button class="btn btn-inverse reset" title="hotkey: <strong>escape</strong>">reset</button>
-				<button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" href="javascript:{}"><span class="caret"></span></button>
-				<ul class="dropdown-menu pull-right">
-					<li><a href="javascript:{}" class="reset" data-reset-with="noise">random noise</a></li>
-					<li><a href="javascript:{}" class="reset" data-reset-with="nothing">emptiness</a></li>
-				</ul>
-			</div>
-			<button class="btn btn-inverse btn-single btn-info"><i class="icon-info-sign icon-white"></i></button>
-			<div class="share">
-				<button class="btn btn-inverse btn-single btn-share">
-					<i class="icon-share icon-white"></i>like / tweet
-				</button>
-				<div class="dropdown">
-					<div class="fb-like" data-href="http://xpl.github.com/life/" data-send="false" data-layout="button_count" data-width="100" data-show-faces="true" data-colorscheme="dark"></div>
-					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://xpl.github.com/life/">Tweet</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-				</div>
-			</div>
 		</div>
 		<div class="viewport-container">
 			<canvas class="viewport" />
@@ -338,6 +338,11 @@
 				<p>This is the classic Conway's Game of Life implemented in JavaScript and hardware-accelerated WebGL. Read <a href="http://en.wikipedia.org/wiki/Conway's_Game_of_Life">Wikipedia article</a> about it.</p>
 				<p>Source code available at GitHub: <a href="https://github.com/xpl/life">https://github.com/xpl/life</a></p>
 				<p>Send feedback to <a href="http://facebook.com/ololoe">facebook.com/ololoe</a> / <a href="mailto:rocket.mind@gmail.com">rocket.mind@gmail.com</a></p>
+				<p>	
+					<div class="fb-like" data-href="http://xpl.github.com/life/" data-send="false" data-layout="button_count" data-width="100" data-show-faces="true" data-colorscheme="dark"></div>
+					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://xpl.github.com/life/">Tweet</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+				</p>
 			</div>
 			<div class="modal-footer">
 				<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
