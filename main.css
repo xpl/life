@@ -14,9 +14,10 @@ body, html {
 .bar {
 	position: fixed;
 	-webkit-box-sizing: border-box; -moz-box-sizing: border-box; -o-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box;
-	width: 100%; padding: 8px;
+	width: 100%; padding: 8px 0;
+	text-align: center;
 }
-.slider { height: 8px; margin-right: 10px; display: inline-block; width: 80px; }
+.slider { height: 8px; margin-right: 10px; display: inline-block; width: 80px; position: relative; top: 2px; }
 .bar .ui-slider { background: black !important; border-color: #555555; }
 .bar .ui-slider-handle,
 .bar .ui-slider-handle.ui-state-focus {
@@ -25,14 +26,14 @@ body, html {
 	background-image: -moz-linear-gradient(top,#444,#222) !important;
 	background-image: linear-gradient(top,#444,#222) !important;
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2),0 1px 2px rgba(0, 0, 0, 0.05); border: 1px solid #BBB; border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) !important;
-	background-color: black; margin-top: -1px;
+	background-color: black; margin-top: -2px;
 }
 .bar .ui-slider-handle.ui-state-hover,
 .bar .ui-slider-handle.ui-state-active { border-color: white !important; }
 .bar .ui-slider-handle.ui-state-focus { outline: none; border-color: white !important; }
 .bar .btn-group { display: inline-block; margin-bottom: 0; }
 .bar .btn { font-size: 12px; height: 22px; padding-top: 0px; padding-left: 7px; padding-right: 7px; font-size: 12px;}
-.control-label { display: inline-block; color: white; font-weight: bold; font-size: 10px; background: rgba(0,0,0,0.5); padding: 0px 7px 1px 7px; border-radius: 3px; position: relative; top: -2px; margin-right: 8px; }
+.control-label { display: inline-block; color: white; font-weight: bold; font-size: 10px; background: rgba(0,0,0,0.5); padding: 0px 7px 1px 7px; border-radius: 3px; margin-right: 8px; }
 .btn-group.brush-type { margin-right: 8px; margin-left: -2px; }
 .brush-settings {  }
 .brush-settings.round .pattern-brush-scale,
@@ -43,7 +44,7 @@ body, html {
 .btn-share i, .btn-pause i { margin-top: 0; margin-right: 2px; margin-left: -2px; }
 .btn-info i { margin-top: 3px; }
 
-.share { display: inline-block; position: relative; }
+.share { display: inline-block; position: relative; margin-right: 10px; }
 .share .btn { position: relative; z-index: 2; }
 .share .dropdown { position: absolute; z-index: 0; width: 100%;
 	-webkit-box-sizing: border-box; -moz-box-sizing: border-box; -o-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box;

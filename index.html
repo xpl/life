@@ -8,9 +8,10 @@
 		<meta property="og:image" content="http://xpl.github.com/conway-fall/preview.jpg" />
 		<meta property="og:site_name" content="Conway Fall" />
 		<meta property="fb:admins" content="1174148385" />
-		<link rel="stylesheet" type="text/css" href="jquery-ui-1.8.16.custom.css"></link>
-		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css"></link>
-		<link rel="stylesheet" type="text/css" href="main.css"></link>
+		<link rel="image_src" href="http://xpl.github.com/conway-fall/preview.jpg" />
+		<link rel="stylesheet" type="text/css" href="jquery-ui-1.8.16.custom.css" />
+		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="main.css" />
 		<script src="jquery-1.8.2.min.js"></script>
 		<script src="jquery-ui-1.9.0.custom.min.js"></script>
 		<script src="jquery.mousewheel.js"></script>
@@ -212,6 +213,17 @@
 		   }(document));
 		</script>
 		<div class="bar controls">
+			<button class="btn btn-inverse btn-single btn-info"><i class="icon-info-sign icon-white"></i></button>
+			<div class="share">
+				<button class="btn btn-inverse btn-single btn-share">
+					<i class="icon-share icon-white"></i>like / tweet
+				</button>
+				<div class="dropdown">
+					<div class="fb-like" data-href="http://xpl.github.com/conway-fall/" data-send="false" data-layout="button_count" data-width="100" data-show-faces="true" data-colorscheme="dark"></div>
+					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://xpl.github.com/conway-fall/">Tweet</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+				</div>
+			</div>
 			<span class="control-label">size X</span><div class="width slider"></div>
 			<span class="control-label">size Y</span><div class="height slider"></div>
 			<span class="control-label">fall</span><div class="scroll-speed slider"></div>
@@ -246,17 +258,6 @@
 					<li><a href="javascript:{}" class="reset" data-reset-with="nothing">emptiness</a></li>
 				</ul>
 			</div>
-			<div class="share">
-				<button class="btn btn-inverse btn-single btn-share">
-					<i class="icon-share icon-white"></i>like / tweet
-				</button>
-				<div class="dropdown">
-					<div class="fb-like" data-href="http://xpl.github.com/conway-fall/" data-send="false" data-layout="button_count" data-width="100" data-show-faces="true" data-colorscheme="dark"></div>
-					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://xpl.github.com/conway-fall/">Tweet</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-				</div>
-			</div>
-			<button class="btn btn-inverse btn-single btn-info"><i class="icon-info-sign icon-white"></i></button>
 		</div>
 		<div class="viewport-container">
 			<canvas class="viewport" />
