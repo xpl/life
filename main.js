@@ -124,7 +124,7 @@ Life = _.extends (Viewport, {
 	},
 	initGUI: function () {
 		this
-			.slider ('.controls .width', { min: 9, max: 13, value: 9 }, function (value) {
+			.slider ('.controls .width', { min: 9, max: 13, value: 10 }, function (value) {
 				this.resizeBuffers (Math.pow (2, value), this.cellBuffer.height)
 			})
 			.slider ('.controls .height', { min: 9, max: 13, value: 9 }, function (value) {
