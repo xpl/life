@@ -34,7 +34,7 @@ body, html {
 .bar .btn-group { display: inline-block; margin-bottom: 0; }
 .bar .btn { font-size: 12px; height: 22px; padding-top: 0px; padding-left: 7px; padding-right: 7px; font-size: 12px;}
 .control-label { display: inline-block; color: white; font-weight: bold; font-size: 10px; background: rgba(0,0,0,0.5); padding: 0px 7px 1px 7px; border-radius: 3px; margin-right: 8px; }
-.btn-group.brush-type { margin-right: 5px; margin-left: -2px; }
+.btn-group.brush-type { margin-right: 5px; margin-left: 2px; }
 .brush-settings.round .pattern-brush-scale,
 .brush-settings.noise .pattern-brush-scale { display: none; }
 .brush-settings.pattern .brush-scale { display: none; }

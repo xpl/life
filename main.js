@@ -318,26 +318,20 @@ Life = _.extends (Viewport, {
 		this.screenTransform = this.transform.multiply (viewportTransform)
 	},
 	beforeDraw: function () {
-		var targetBuffer = (this.cellBuffer == this.cellBuffer1 ? this.cellBuffer2 : this.cellBuffer1) /* backbuffering */
-		targetBuffer.draw (function () {
-			if (!this.paused) {
-				if ((this.numIterationsPassed % (this.numIterationsToSkip + 1)) == 0) {
-					if (this.isPainting) {
-						this.paint (true)
-					} else {
-						this.iteration ()
-					}
-					this.cellBuffer = targetBuffer
-				} else if (this.isPainting) {
-					this.paint (false)
-					this.cellBuffer = targetBuffer
+		if (!this.paused) {
+			if ((this.numIterationsPassed % (this.numIterationsToSkip + 1)) == 0) {
+				if (this.isPainting) {
+					this.paint (true)
+				} else {
+					this.iterate ()
 				}
-				this.numIterationsPassed++
 			} else if (this.isPainting) {
 				this.paint (false)
-				this.cellBuffer = targetBuffer
 			}
-		}, this)
+			this.numIterationsPassed++
+		} else if (this.isPainting) {
+			this.paint (false)
+		}
 		if (this.isCloning) {
 			this.updateBrushBuffer ()
 		}
@@ -346,13 +340,21 @@ Life = _.extends (Viewport, {
 	getScrollSpeed: function () {
 		return this.numIterationsPassed && this.scrollSpeed /* do not apply offset on first iteration (no previous data) */
 	},
-	iteration: function () {
-		this.iterationShader.use ()
-		this.iterationShader.attributes.position.bindBuffer (this.square)
-		this.iterationShader.uniforms.previousStep.bindTexture (this.cellBuffer, 0)
-		this.iterationShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
-		this.iterationShader.uniforms.pixelOffset.set2f (0.0 / this.cellBuffer.width, -(0.5 + this.getScrollSpeed ()) / this.cellBuffer.height)
-	    this.square.draw ()
+	renderCells: function (callback) {
+		/* backbuffering */
+		var targetBuffer = (this.cellBuffer == this.cellBuffer1 ? this.cellBuffer2 : this.cellBuffer1)
+		targetBuffer.draw (callback, this)
+		this.cellBuffer = targetBuffer
+	},
+	iterate: function () {
+		this.renderCells (function () {
+			this.iterationShader.use ()
+			this.iterationShader.attributes.position.bindBuffer (this.square)
+			this.iterationShader.uniforms.previousStep.bindTexture (this.cellBuffer, 0)
+			this.iterationShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
+			this.iterationShader.uniforms.pixelOffset.set2f (0.0 / this.cellBuffer.width, -(0.5 + this.getScrollSpeed ()) / this.cellBuffer.height)
+		    this.square.draw ()
+		})
 	},
 	paint: function (animate) {
 		if (this.brushType == 'pattern' && this.brushBufferReady) {
@@ -363,43 +365,47 @@ Life = _.extends (Viewport, {
 		this.paintFrom = this.paintTo
 	},
 	paintBrushBuffer: function (animate) {
-		this.patternBrushShader.use ()
-		this.patternBrushShader.attributes.position.bindBuffer (this.square)
-		this.patternBrushShader.uniforms.cells.bindTexture (this.cellBuffer, 0)
-		this.patternBrushShader.uniforms.brush.bindTexture (this.brushBuffer, 1)
-		this.patternBrushShader.uniforms.pixelOffset.set2f (0.0,
-			animate ? (-(0.5 + this.getScrollSpeed ()) / this.cellBuffer.height) : 0.0)
-		this.patternBrushShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
-		this.patternBrushShader.uniforms.color.set3fv (this.eraseMode ? vec3.create ([0,0,0]) : vec3.create ([1,1,1]))
-		this.patternBrushShader.uniforms.origin.set2fv (this.screenTransform.applyInverse (this.paintTo))
-		this.patternBrushShader.uniforms.animate.set1i (animate ? 1 : 0)
-		this.patternBrushShader.uniforms.scale.set2f (
-			(this.brushBuffer.width / this.cellBuffer.width) * this.patternBrushScale,
-			(this.brushBuffer.height / this.cellBuffer.height) * this.patternBrushScale)
-		this.square.draw ()
+		this.renderCells (function () {
+			this.patternBrushShader.use ()
+			this.patternBrushShader.attributes.position.bindBuffer (this.square)
+			this.patternBrushShader.uniforms.cells.bindTexture (this.cellBuffer, 0)
+			this.patternBrushShader.uniforms.brush.bindTexture (this.brushBuffer, 1)
+			this.patternBrushShader.uniforms.pixelOffset.set2f (0.0,
+				animate ? (-(0.5 + this.getScrollSpeed ()) / this.cellBuffer.height) : 0.0)
+			this.patternBrushShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
+			this.patternBrushShader.uniforms.color.set3fv (this.eraseMode ? vec3.create ([0,0,0]) : vec3.create ([1,1,1]))
+			this.patternBrushShader.uniforms.origin.set2fv (this.screenTransform.applyInverse (this.paintTo))
+			this.patternBrushShader.uniforms.animate.set1i (animate ? 1 : 0)
+			this.patternBrushShader.uniforms.scale.set2f (
+				(this.brushBuffer.width / this.cellBuffer.width) * this.patternBrushScale,
+				(this.brushBuffer.height / this.cellBuffer.height) * this.patternBrushScale)
+			this.square.draw ()
+		})
 	},
 	paintParametricBrush: function (animate) {
-		var pixelSpace = new Transform ()
-			.scale ([this.viewportWidth, this.viewportHeight, 1.0])
-			.multiply (this.screenTransform)
-		var texelSize =
-			pixelSpace.apply ([0,0,0])[0] -
-			pixelSpace.apply ([-1.0 / this.cellBuffer.width, 0, 0])[0]
-		this.parametricBrushShader.use ()
-		this.parametricBrushShader.attributes.position.bindBuffer (this.square)
-		this.parametricBrushShader.uniforms.cells.bindTexture (this.cellBuffer, 0)
-		this.parametricBrushShader.uniforms.brushPosition1.set2fv (this.screenTransform.applyInverse (this.paintFrom))
-		this.parametricBrushShader.uniforms.brushPosition2.set2fv (this.screenTransform.applyInverse (this.paintTo))
-		this.parametricBrushShader.uniforms.pixelSpace.setMatrix (pixelSpace)
-		this.parametricBrushShader.uniforms.pixelOffset.set2f (0.0,
-			animate ? (-(0.5 + this.getScrollSpeed ()) / this.cellBuffer.height) : 0.0)
-		this.parametricBrushShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
-		this.parametricBrushShader.uniforms.brushSize.set1f (Math.max (this.brushSize, texelSize))
-		this.parametricBrushShader.uniforms.seed.set2f (Math.random (), Math.random ())
-		this.parametricBrushShader.uniforms.noise.set1i (this.brushType == 'noise')
-		this.parametricBrushShader.uniforms.fill.set1f (this.eraseMode ? 0.0 : 1.0)
-		this.parametricBrushShader.uniforms.animate.set1i (animate ? 1 : 0)
-	    this.square.draw ()
+		this.renderCells (function () {
+			var pixelSpace = new Transform ()
+				.scale ([this.viewportWidth, this.viewportHeight, 1.0])
+				.multiply (this.screenTransform)
+			var texelSize =
+				pixelSpace.apply ([0,0,0])[0] -
+				pixelSpace.apply ([-1.0 / this.cellBuffer.width, 0, 0])[0]
+			this.parametricBrushShader.use ()
+			this.parametricBrushShader.attributes.position.bindBuffer (this.square)
+			this.parametricBrushShader.uniforms.cells.bindTexture (this.cellBuffer, 0)
+			this.parametricBrushShader.uniforms.brushPosition1.set2fv (this.screenTransform.applyInverse (this.paintFrom))
+			this.parametricBrushShader.uniforms.brushPosition2.set2fv (this.screenTransform.applyInverse (this.paintTo))
+			this.parametricBrushShader.uniforms.pixelSpace.setMatrix (pixelSpace)
+			this.parametricBrushShader.uniforms.pixelOffset.set2f (0.0,
+				animate ? (-(0.5 + this.getScrollSpeed ()) / this.cellBuffer.height) : 0.0)
+			this.parametricBrushShader.uniforms.screenSpace.set2f (1.0 / this.cellBuffer.width, 1.0 / this.cellBuffer.height)
+			this.parametricBrushShader.uniforms.brushSize.set1f (Math.max (this.brushSize, texelSize))
+			this.parametricBrushShader.uniforms.seed.set2f (Math.random (), Math.random ())
+			this.parametricBrushShader.uniforms.noise.set1i (this.brushType == 'noise')
+			this.parametricBrushShader.uniforms.fill.set1f (this.eraseMode ? 0.0 : 1.0)
+			this.parametricBrushShader.uniforms.animate.set1i (animate ? 1 : 0)
+		    this.square.draw ()
+		})
 	},
 	updateBrushBuffer: function () {
 		this.brushBuffer.draw (function () {
