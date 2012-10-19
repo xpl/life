@@ -34,6 +34,28 @@ Transform = _.prototype ({
 	}
 })
 
+Texture = _.prototype ({
+	constructor: function (cfg) {
+		_.extend (this, {
+			gl: cfg.gl,
+			texture: cfg.gl.createTexture (),
+			width: cfg.width,
+			height: cfg.height
+		})
+		this.gl.bindTexture (this.gl.TEXTURE_2D, this.texture)
+		this.gl.texParameteri (this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST)
+		this.gl.texParameteri (this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST)
+		this.gl.texParameteri (this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE)
+		this.gl.texParameteri (this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE)
+		this.update (cfg.data)
+	},
+	update: function (data) {
+		this.gl.bindTexture (this.gl.TEXTURE_2D, this.texture)
+		this.gl.texImage2D (this.gl.TEXTURE_2D, 0, this.gl.RGBA,
+			this.width, this.height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, data)
+	}
+})
+
 RenderTexture = _.prototype ({
 	constructor: function (cfg) {
 		_.extend (this, {
@@ -105,6 +127,9 @@ ShaderUniform = _.prototype ({
 	},
 	set1i: function (x) {
 		this.gl.uniform1i (this.location, x)
+	},
+	set1iv: function (x) {
+		this.gl.uniform1iv (this.location, x)
 	},
 	set1f: function (x) {
 		this.gl.uniform1f (this.location, x)
@@ -197,6 +222,9 @@ Viewport = _.prototype ({
 	},
 	shaderProgram: function (cfg) {
 		return new ShaderProgram (_.extend ({ gl: this.gl }, cfg))
+	},
+	texture: function (cfg) {
+		return new Texture (_.extend ({ gl: this.gl }, cfg))
 	},
 	renderTexture: function (cfg) {
 		return new RenderTexture (_.extend ({ gl: this.gl }, cfg))

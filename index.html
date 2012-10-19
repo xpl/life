@@ -40,13 +40,14 @@
 		    varying vec2 texCoord;
 		    uniform sampler2D previousStep;
 		    uniform vec2 screenSpace;
+		    uniform sampler2D rules;
 		    vec4 pixelAt (vec2 offset) {
 		    	return texture2D (previousStep, texCoord + offset * screenSpace);
 		    }
 		    void main (void) {
 		    	vec4 cell = pixelAt (vec2 ( 0,  0));
 		    	float neighbours =
-		    		(pixelAt (vec2 (-1.0, -1.0)) +
+		    	    (pixelAt (vec2 (-1.0, -1.0)) +
 		        	 pixelAt (vec2 ( 0.0, -1.0)) +
 		        	 pixelAt (vec2 ( 1.0, -1.0)) +
 		        	 pixelAt (vec2 ( 1.0,  0.0)) +
@@ -54,11 +55,11 @@
 		        	 pixelAt (vec2 ( 0.0,  1.0)) +
 		        	 pixelAt (vec2 (-1.0,  1.0)) +
 		        	 pixelAt (vec2 (-1.0,  0.0))).x;
-
-		    	if (cell.x > 0.1 && (neighbours > 3.1 || neighbours < 1.9)) {
-		    		gl_FragColor = vec4 (0.0, 1.0, cell.z, 1.0);
-		    	} else if (neighbours > 2.9 && neighbours < 3.1) {
+		    	vec4 decision = texture2D (rules, vec2 (neighbours / 16.0, 0.0));	
+		    	if (cell.x < 0.9 && decision.g > 0.0) {
 		    		gl_FragColor = vec4 (1.0, 1.0, 0.0, 1.0);
+		    	} else if (cell.x > 0.0 && decision.r > 0.0) {
+		    		gl_FragColor = vec4 (0.0, 1.0, cell.z, 1.0);
 		    	} else {
 		    		gl_FragColor = cell * vec4 (1.0, 0.994, 1.0, 1.0);
 		    	}
@@ -81,6 +82,7 @@
 		    varying vec2 texCoord;
 		    uniform sampler2D cells;
 		    uniform sampler2D brush;
+		    uniform sampler2D rules;
 		    uniform vec2 screenSpace;
 		    uniform vec2 origin;
 		    uniform vec2 scale;
@@ -101,10 +103,11 @@
 			        	 pixelAt (vec2 ( 0.0,  1.0)) +
 			        	 pixelAt (vec2 (-1.0,  1.0)) +
 			        	 pixelAt (vec2 (-1.0,  0.0))).x;
-			    	if (cell.x > 0.1 && (neighbours > 3.1 || neighbours < 1.9)) {
-			    		cell = vec4 (0.0, 1.0, cell.z, 1.0); /* die */
-			    	} else if (neighbours > 2.9 && neighbours < 3.1) {
-			    		cell = vec4 (1.0, 1.0, 0.0, 1.0); /* born */
+			    	vec4 decision = texture2D (rules, vec2 (neighbours / 16.0, 0.0));	
+			    	if (cell.x < 0.9 && decision.g > 0.0) {
+			    		cell = vec4 (1.0, 1.0, 0.0, 1.0);
+			    	} else if (cell.x > 0.0 && decision.r > 0.0) {
+			    		cell = vec4 (0.0, 1.0, cell.z, 1.0);
 			    	} else {
 			    		cell = cell * vec4 (1.0, 0.994, 1.0, 1.0);
 			    	}
@@ -127,6 +130,7 @@
 		    varying vec2 fragmentPosition;
 		    varying vec2 texCoord;
 		    uniform sampler2D cells;
+		    uniform sampler2D rules;
 		    uniform vec2 brushPosition1;
 		    uniform vec2 brushPosition2;
 		    uniform float brushSize;
@@ -170,10 +174,11 @@
 				        	 pixelAt (vec2 ( 0.0,  1.0)) +
 				        	 pixelAt (vec2 (-1.0,  1.0)) +
 				        	 pixelAt (vec2 (-1.0,  0.0))).x;
-				    	if (cell.x > 0.1 && (neighbours > 3.1 || neighbours < 1.9)) {
-				    		cell = vec4 (0.0, 1.0, cell.z, 1.0); /* die */
-				    	} else if (neighbours > 2.9 && neighbours < 3.1) {
-				    		cell = vec4 (1.0, 1.0, 0.0, 1.0); /* born */
+				    	vec4 decision = texture2D (rules, vec2 (neighbours / 16.0, 0.0));	
+				    	if (cell.x < 0.9 && decision.g > 0.0) {
+				    		cell = vec4 (1.0, 1.0, 0.0, 1.0);
+				    	} else if (cell.x > 0.0 && decision.r > 0.0) {
+				    		cell = vec4 (0.0, 1.0, cell.z, 1.0);
 				    	} else {
 				    		cell = cell * vec4 (1.0, 0.994, 1.0, 1.0);
 				    	}
@@ -285,7 +290,9 @@
 			<button class="btn btn-inverse btn-single btn-pause" title="hotkey: <strong>space</strong>">
 				<i class="icon-pause icon-white"></i>pause
 			</button>
-			<span class="control-label">speed</span><div class="scroll-speed slider"></div>
+			<button class="btn btn-inverse btn-single btn-scroll yes" title="enable/disable scroll animation">
+				<i class="icon-remove icon-white"></i><i class="icon-arrow-down icon-white"></i>scroll
+			</button>
 			<span class="brush-settings round">
 				<span class="control-label" style="margin-right: 4px;">brush</span>
 				<div class="brush-scale slider"></div>
@@ -308,6 +315,14 @@
 			<span class="control-label">size X</span><div class="width slider"></div>
 			<span class="control-label">size Y</span><div class="height slider"></div>
 			<!--<span class="control-label">speed</span><div class="speed slider"></div>-->
+			<div class="btn-group">
+				<button class="btn btn-inverse btn-single btn-rules yes dropdown-toggle">
+					<i class="icon-pencil icon-white"></i>rules
+					<span class="caret"></span>
+				</button>
+				<div class="pull-right rules-editor hide">
+				</div>
+			</div>
 		</div>
 		<div class="viewport-container">
 			<canvas class="viewport" />

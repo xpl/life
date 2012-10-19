@@ -39,17 +39,23 @@ body, html {
 .brush-settings.noise .pattern-brush-scale { display: none; }
 .brush-settings.pattern .brush-scale { display: none; }
 .btn-single { margin-top: -2px; }
-.btn-share i, .btn-pause i { margin-top: 0; margin-right: 2px; margin-left: -2px; }
+.btn-share i, .btn-pause i, .btn-scroll i, .btn-rules i { margin-top: 0; margin-right: 3px; margin-left: -4px; }
 .btn-info i { margin-top: 3px; }
-.btn-pause { margin-right: 10px; }
+
+.btn-scroll .icon-remove { display: none; }
+.btn-scroll.yes .icon-arrow-down { display: none; }
+.btn-scroll.yes .icon-remove { display: inline-block; }
 
 .dropdown-menu { text-align: left; }
+
+.rules-editor { position: absolute; right: -7px; padding: 7px; width: auto; min-width: 0; background: rgba(0,0,0,0.75); border-radius: 3px; }
+.rules-editor .count { margin-right: 5px; font-size: 11px; color: white; }
 
 .share { display: inline-block; position: relative; }
 .share .btn { position: relative; z-index: 2; }
 .share .dropdown { position: absolute; z-index: 0; width: 100%;
 	-webkit-box-sizing: border-box; -moz-box-sizing: border-box; -o-box-sizing: border-box; -ms-box-sizing: border-box; box-sizing: border-box;
-	border-radius: 3px; top: 0px; padding: 25px 4px 4px 4px; background: rgba(0,0,0,0.25); visibility: hidden; }
+	border-radius: 3px; top: 0px; padding: 25px 4px 4px 4px; background-color: rgba(0,0,0,0.25); visibility: hidden; }
 .share:hover .dropdown { visibility: visible; }
 .share .fb-like { margin-bottom: 4px; }
 
