@@ -2,7 +2,7 @@
  * Licensed under:	MIT
  */
 
-var debug = true
+var debug = false
 
 Life = _.extends (Viewport, {
 	init: function () {
