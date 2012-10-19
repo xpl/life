@@ -41,6 +41,7 @@ body, html {
 .btn-single { margin-top: -2px; }
 .btn-share i, .btn-pause i, .btn-scroll i, .btn-rules i { margin-top: 0; margin-right: 3px; margin-left: -4px; }
 .btn-info i { margin-top: 3px; }
+.btn-reset { margin-right: 0; }
 
 .btn-scroll .icon-remove { display: none; }
 .btn-scroll.yes .icon-arrow-down { display: none; }
