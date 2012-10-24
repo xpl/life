@@ -237,9 +237,9 @@ Viewport = _.prototype ({
 		return new RenderTexture (_.extend ({ gl: this.gl }, cfg))
 	},
 	render: function () {
-		var currentTime = new Date ().getTime ()
-		this.FPS = 1.0 / (this.elapsedTime = (currentTime - this.lastFrameTime) / 1000.0)
-		this.lastFrameTime = currentTime
+		//var currentTime = new Date ().getTime ()
+		//this.FPS = 1.0 / (this.elapsedTime = (currentTime - this.lastFrameTime) / 1000.0)
+		//this.lastFrameTime = currentTime
 		this.beforeDraw ()
 		this.gl.viewport (0, 0, this.viewportWidth, this.viewportHeight)
 		this.draw ()
