@@ -8,9 +8,9 @@ Life = _.extends (Viewport, {
 	init: function () {
 		_.extend (this, {
 			/* shaders */
-			initialSetupShader: this.shaderProgram ({
+			randomNoiseShader: this.shaderProgram ({
 				vertex: 'cell-vs',
-				fragment: 'cell-initial-setup-fs',
+				fragment: 'cell-random-noise-fs',
 				attributes: ['position'],
 				uniforms: ['seed']
 			}),
@@ -334,9 +334,9 @@ Life = _.extends (Viewport, {
 	},
 	fillWithRandomNoise: function () {
 		this.cellBuffer.draw (function () {
-			this.initialSetupShader.use ()
-			this.initialSetupShader.attributes.position.bindBuffer (this.square)
-			this.initialSetupShader.uniforms.seed.set2f (Math.random (), Math.random ())
+			this.randomNoiseShader.use ()
+			this.randomNoiseShader.attributes.position.bindBuffer (this.square)
+			this.randomNoiseShader.uniforms.seed.set2f (Math.random (), Math.random ())
 			this.square.draw ()
 		}, this)
 		this.firstFrame = true
