@@ -14,6 +14,12 @@ Life = _.extends (Viewport, {
 				attributes: ['position'],
 				uniforms: ['seed']
 			}),
+			updateFromBitmapShader: this.shaderProgram ({
+				vertex: 'cell-vs',
+				fragment: 'cell-update-from-bitmap-fs',
+				attributes: ['position'],
+				uniforms: ['source']
+			}),
 			iterationShader: this.shaderProgram ({
 				vertex: 'cell-vs-pixeloffset',
 				fragment: 'cell-iteration-fs',
@@ -243,6 +249,21 @@ Life = _.extends (Viewport, {
 	reset: function (type) {
 		if (type == 'noise') {
 			this.fillWithRandomNoise ()
+		} else if (type == 'turing') {
+			$('.modal-overlay.loading').fadeIn (200)
+			this.resizeBuffers (2048, 2048)
+			var image = new Image ();
+  			image.onload = $.proxy (function () {
+  				this.cellBuffer.updateFromImage (image)
+  				this.cellBuffer.draw (function () {
+					this.updateFromBitmapShader.use ()
+					this.updateFromBitmapShader.attributes.position.bindBuffer (this.square)
+					this.updateFromBitmapShader.uniforms.source.bindTexture (cellBuffer)
+					this.square.draw ()
+				}, this)
+				$('.modal-overlay.loading').fadeOut (200)
+  			}, this)
+			image.src = 'turing-machine.png';
 		} else {
 			this.fillWithNothing ()
 		}
@@ -312,7 +333,6 @@ Life = _.extends (Viewport, {
 		}, this))
 	},
 	fillWithRandomNoise: function () {
-		this.gl.clearColor (0.0, 0.0, 0.0, 1.0)
 		this.cellBuffer.draw (function () {
 			this.initialSetupShader.use ()
 			this.initialSetupShader.attributes.position.bindBuffer (this.square)
@@ -322,8 +342,8 @@ Life = _.extends (Viewport, {
 		this.firstFrame = true
 	},
 	fillWithNothing: function () {
-		this.gl.clearColor (0.0, 0.0, 0.0, 1.0)
 		this.cellBuffer.draw (function () {
+			this.gl.clearColor (0.0, 0.0, 0.0, 1.0)
 			this.gl.clear (this.gl.COLOR_BUFFER_BIT)
 		}, this)
 	},

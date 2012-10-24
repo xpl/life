@@ -47,7 +47,9 @@ Texture = _.prototype ({
 		this.gl.texParameteri (this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST)
 		this.gl.texParameteri (this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE)
 		this.gl.texParameteri (this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE)
-		this.update (cfg.data)
+		if (cfg.data) {
+			this.update (cfg.data)
+		}
 	},
 	update: function (data) {
 		this.gl.bindTexture (this.gl.TEXTURE_2D, this.texture)
@@ -85,6 +87,11 @@ RenderTexture = _.prototype ({
 			this.gl.texImage2D (this.gl.TEXTURE_2D, 0, this.gl.RGBA,
 				this.width = width, this.height = height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null)
 		}
+	},
+	updateFromImage: function (image) {
+		this.gl.bindTexture (this.gl.TEXTURE_2D, this.texture)
+		this.gl.pixelStorei (this.gl.UNPACK_FLIP_Y_WEBGL, true);
+        this.gl.texImage2D (this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
 	}
 })
 
