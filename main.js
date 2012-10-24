@@ -258,7 +258,7 @@ Life = _.extends (Viewport, {
   				this.cellBuffer.draw (function () {
 					this.updateFromBitmapShader.use ()
 					this.updateFromBitmapShader.attributes.position.bindBuffer (this.square)
-					this.updateFromBitmapShader.uniforms.source.bindTexture (cellBuffer)
+					this.updateFromBitmapShader.uniforms.source.bindTexture (this.cellBuffer)
 					this.square.draw ()
 				}, this)
 				$('.modal-overlay.loading').fadeOut (200)
