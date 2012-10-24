@@ -13,7 +13,6 @@
 		<link rel="stylesheet" type="text/css" href="jquery-ui-1.8.16.custom.css" />
 		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css" />
 		<link rel="stylesheet" type="text/css" href="main.css" />
-		<script src="http://connect.facebook.net/en_US/all.js"></script>
 		<script src="jquery-1.8.2.min.js"></script>
 		<script src="jquery-ui-1.9.0.custom.min.js"></script>
 		<script src="jquery.mousewheel.js"></script>
@@ -263,15 +262,22 @@
 		<!-- facebook SDK init { -->
 			<div id="fb-root"></div>
 			<script>
-			  $(document).ready (function () {
-			    FB.init({
-			      appId      : '292298590870600',
-			      channelUrl : 'http://xpl.github.com/channel.html',
-			      status     : true,
-			      cookie     : false,
-			      xfbml      : true
-			    })
-			  })
+				window.fbAsyncInit = function () {
+					FB.init({
+						appId      : '292298590870600',
+						channelUrl : 'http://xpl.github.com/channel.html',
+						status     : true,
+						cookie     : false,
+						xfbml      : true
+					})
+				}
+				(function(d){
+					var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+					if (d.getElementById(id)) {return;}
+					js = d.createElement('script'); js.id = id; js.async = true;
+					js.src = "//connect.facebook.net/en_US/all.js";
+					ref.parentNode.insertBefore(js, ref);
+				}(document))
 			</script>
 		<!-- } facebook SDK init -->
 		<div class="bar controls">
