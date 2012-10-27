@@ -8,7 +8,7 @@ function domAPI (name) {
 	}), _.identity)
 }
 
-window.requestAnimationFrame = domAPI ('requestAnimationFrame')
+window.requestAnimationFrame = domAPI ('requestAnimationFrame') || function (frame) { window.setTimeout (frame, 1000 / 60) }
 
 Transform = _.prototype ({
 	constructor: function (value) {
