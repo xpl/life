@@ -274,19 +274,6 @@ Life = _.extends (Viewport, {
 			(e.clientX - offset.left) / (this.viewportWidth * 0.5) - 1.0,
 			(offset.top - e.clientY) / (this.viewportHeight * 0.5) + 1.0, 0.0]
 	},
-	onDragStart: function (e) {
-		this.isDragging = true
-		var origin = this.transform.applyInverse (this.eventPoint (e))
-		$(window).mousemove ($.proxy (function (e) {
-			var point = this.transform.applyInverse (this.eventPoint (e))
-			this.updateTransform (this.transform.translate ([point[0] - origin[0], point[1] - origin[1], 0.0]))
-		}, this))
-		$(window).mouseup ($.proxy (function () {
-			this.isDragging = false
-			$(window).unbind ('mouseup')
-			$(window).unbind ('mousemove')
-		}, this))
-	},
 	onZoom: function (e) {
 		var zoom = Math.pow (1.03, e.originalEvent.wheelDelta ?
 			(e.originalEvent.wheelDelta / (navigator.platform == 'MacIntel' ? 360.0 : 36.0)) : -e.originalEvent.detail)
@@ -300,6 +287,35 @@ Life = _.extends (Viewport, {
 		return vec3.length (vec3.subtract (
 				this.transform.apply ([0, 0, 0]),
 				this.transform.apply ([1, 0, 0])))
+	},
+	onDragStart: function (e) {
+		this.isDragging = true
+		var origin = this.transform.applyInverse (this.eventPoint (e))
+		$(window).mousemove ($.proxy (function (e) {
+			var point = this.transform.applyInverse (this.eventPoint (e))
+			this.updateTransform (this.transform.translate ([point[0] - origin[0], point[1] - origin[1], 0.0]))
+		}, this))
+		$(window).mouseup ($.proxy (function () {
+			this.isDragging = false
+			$(window).unbind ('mouseup')
+			$(window).unbind ('mousemove')
+		}, this))
+	},
+	onPaintStart: function (e) {
+		this.paintFrom = this.paintTo = this.eventPoint (e)
+		this.eraseMode = e.shiftKey
+		this.shouldPaint = true
+		this.isPainting = true
+		$(window).mousemove ($.proxy (function (e) {
+			this.paintTo = this.eventPoint (e)
+			this.eraseMode = e.shiftKey
+			this.shouldPaint = true
+		}, this))
+		$(window).mouseup ($.proxy (function () {
+			this.isPainting = false
+			$(window).unbind ('mouseup')
+			$(window).unbind ('mousemove')
+		}, this))
 	},
 	onCloneStart: function (e) {
 		$('.brush-type .pattern').tooltip ('hide')
@@ -315,20 +331,6 @@ Life = _.extends (Viewport, {
 		$(window).keyup ($.proxy (function () {
 			this.isCloning = false
 			$(window).unbind ('keyup')
-			$(window).unbind ('mousemove')
-		}, this))
-	},
-	onPaintStart: function (e) {
-		this.isPainting = true
-		this.paintFrom = this.paintTo = this.eventPoint (e)
-		this.eraseMode = e.shiftKey
-		$(window).mousemove ($.proxy (function (e) {
-			this.paintTo = this.eventPoint (e)
-			this.eraseMode = e.shiftKey
-		}, this))
-		$(window).mouseup ($.proxy (function () {
-			this.isPainting = false
-			$(window).unbind ('mouseup')
 			$(window).unbind ('mousemove')
 		}, this))
 	},
@@ -385,12 +387,12 @@ Life = _.extends (Viewport, {
 	},
 	beforeDraw: function () {
 		if (!this.paused) {
-			if (this.isPainting) {
+			if (this.shouldPaint) {
 				this.paint (true)
 			} else {
 				this.iterate ()
 			}
-		} else if (this.isPainting) {
+		} else if (this.shouldPaint) {
 			this.paint (false)
 		}
 		if (this.isCloning) {
@@ -425,6 +427,7 @@ Life = _.extends (Viewport, {
 			this.paintParametricBrush (animate)
 		}
 		this.paintFrom = this.paintTo
+		this.shouldPaint = false
 	},
 	paintBrushBuffer: function (animate) {
 		this.renderCells (function () {
