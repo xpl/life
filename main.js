@@ -127,7 +127,7 @@ Life = _.extends (Viewport, {
 				case 82: /* r */ this.setBrushType ('round'); break;
 				case 78: /* n */ this.setBrushType ('noise'); break;
 				case 32: /* space */ this.paused = !this.paused; break;
-				case 27: /* esc */ $('.reset').click (); break;
+				case 27: /* esc */ this.reset ('nothing'); $('.controls .scroll-speed').slider ('value', this.scrollSpeed = 0); break;
 			}
 		}, this))
 		$(window).resize ($.proxy (function () {
