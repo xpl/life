@@ -24,6 +24,7 @@
 		<script src="main.js"></script>
 		<!-- shaders -->
 		<script id="cell-random-noise-fs" type="x-shader/x-fragment">
+			#version 100
 		    precision mediump float;
 		    varying vec2 fragmentPosition;
 		    uniform vec2 seed;
@@ -36,6 +37,7 @@
 		    }
 		</script>
 		<script id="cell-update-from-bitmap-fs" type="x-shader/x-fragment">
+			#version 100
 		    precision mediump float;
 		    varying vec2 texCoord;
 		    uniform sampler2D source;
@@ -47,6 +49,7 @@
 		    }
 		</script>
 		<script id="cell-iteration-fs" type="x-shader/x-fragment">
+			#version 100
 		    precision highp float;
 		    varying vec2 texCoord;
 		    uniform sampler2D previousStep;
@@ -77,6 +80,7 @@
 		    }
 		</script>
 		<script id="cell-copy-brush-fs" type="x-shader/x-fragment">
+			#version 100
 		    precision mediump float;
 		    varying vec2 fragmentPosition;
 		    uniform vec2 origin;
@@ -88,6 +92,7 @@
 		    }
 		</script>
 		<script id="cell-bake-brush-fs" type="x-shader/x-fragment">
+			#version 100
 		    precision mediump float;
 		    varying vec2 fragmentPosition;
 		    varying vec2 texCoord;
@@ -137,6 +142,7 @@
 		    }
 		</script>
 		<script id="cell-brush-fs" type="x-shader/x-fragment">
+			#version 100
 		    precision highp float;
 		    varying vec2 fragmentPosition;
 		    varying vec2 texCoord;
@@ -154,15 +160,15 @@
 		    float rand (vec2 co) {
     			return fract (sin (dot (co.xy ,vec2 (12.9898,78.233))) * 43758.5453) > 0.6 ? 1.0 : 0.0;
 			}
-		    float dot (vec2 x) { return dot (x, x); }
+		    float dotdot (vec2 x) { return dot (x, x); }
 		    float distToSegmentSquared (vec2 v, vec2 w, vec2 p) {
-				float l2 = dot (v - w);
-				if (l2 == 0.0) return dot (p - v);
+				float l2 = dotdot (v - w);
+				if (l2 == 0.0) return dotdot (p - v);
 				float t = dot(p - v, w - v) / l2;
-				if (t < 0.0) return dot (p - v);
-				else if (t > 1.0) return dot (p - w);
+				if (t < 0.0) return dotdot (p - v);
+				else if (t > 1.0) return dotdot (p - w);
 				vec2 projection = v + t * (w - v);
-				return dot(p - projection);
+				return dotdot (p - projection);
 			}
 			vec4 pixelAt (vec2 offset) {
 		    	return texture2D (cells, texCoord + offset * screenSpace);
@@ -199,6 +205,7 @@
 		    }
 		</script>
 		<script id="cell-vs-pixeloffset" type="x-shader/x-vertex">
+			#version 100
 			precision highp float;
 		    attribute vec3 position;
 		    uniform vec2 pixelOffset;
@@ -211,6 +218,7 @@
 		    }
 		</script>
 		<script id="cell-vs" type="x-shader/x-vertex">
+			#version 100
 			precision mediump float;
 		    attribute vec3 position;
 		    varying vec2 fragmentPosition;
@@ -222,6 +230,7 @@
 		    }
 		</script>
 		<script id="draw-cells-fs" type="x-shader/x-fragment">
+			#version 100
 		    precision mediump float;
 		    varying vec2 texCoord;
 		    uniform sampler2D cells;
@@ -239,6 +248,7 @@
 		    }
 		</script>
 		<script id="brush-selection-cursor-fs" type="x-shader/x-fragment">
+			#version 100
 		    precision mediump float;
 		    varying vec2 texCoord;
 		    uniform sampler2D color;
@@ -248,6 +258,7 @@
 		    }
 		</script>
 		<script id="simple-vs" type="x-shader/x-vertex">
+			#version 100
 			precision mediump float;
 		    attribute vec3 position;
 		 	varying vec2 texCoord;
