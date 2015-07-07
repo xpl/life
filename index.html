@@ -270,38 +270,8 @@
 		</script>
 	</head>
 	<body>
-		<!-- facebook SDK init { -->
-			<div id="fb-root"></div>
-			<script>
-				window.fbAsyncInit = function () {
-					FB.init({
-						appId      : '292298590870600',
-						channelUrl : 'http://xpl.github.com/channel.html',
-						status     : true,
-						cookie     : false,
-						xfbml      : true
-					})
-				};
-				(function(d){
-					var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-					if (d.getElementById(id)) {return;}
-					js = d.createElement('script'); js.id = id; js.async = true;
-					js.src = "http://connect.facebook.net/en_US/all.js";
-					ref.parentNode.insertBefore(js, ref);
-				}(document));
-			</script>
-		<!-- } facebook SDK init -->
 		<div class="bar controls">
-			<div class="share">
-				<button class="btn btn-inverse btn-share">
-					<i class="icon-share icon-white"></i>like / tweet
-				</button>
-				<div class="dropdown">
-					<div class="fb-like" data-href="http://xpl.github.com/life/" data-send="false" data-layout="button_count" data-width="100" data-show-faces="true" data-colorscheme="dark"></div>
-					<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://xpl.github.com/life/">Tweet</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-				</div>
-			</div>
+			<button class="btn btn-inverse"><a href="https://xpl.github.io/expression">NEW VERSION WITH COLORS</a></button>
 			<button class="btn btn-inverse btn-info"><i class="icon-info-sign icon-white"></i></button>
 			<button class="btn btn-inverse btn-pause" title="hotkey: <strong>space</strong>">
 				<i class="icon-pause icon-white"></i>pause
